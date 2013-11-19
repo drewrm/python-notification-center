@@ -1,5 +1,5 @@
 #include <Python.h>
-#import "notifications/notification.h"
+#include "notifications/notification.h"
 
 static PyMethodDef notifications_methods[] = {
     {NULL}  /* Sentinel */

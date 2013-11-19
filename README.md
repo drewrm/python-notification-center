@@ -7,5 +7,6 @@ PyObjC, just because I wanted to write a native Python module
 Usage:
 
     import notifications
-    n = notifications.UserNotification(title="Hello World", content="Testing testing testing")
-    n = notifications.UserNotification(title="Hello World", content="Testing testing testing", delay=10)
+    n = notifications.UserNotification(title="Hello World", body="Testing testing testing")
+    n.delay = 60
+    n.show()

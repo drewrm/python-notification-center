@@ -1,15 +1,39 @@
 #include <Python.h>
 #include <NSUserNotification.h>
+#include "structmember.h"
 
 typedef struct {
   PyObject_HEAD;
-  NSUserNotification *notification;
+  PyObject *title;
+  PyObject *subtitle;
+  PyObject *body;
   int delay;
 } notifications_Notification;
 
 void Notification_dealloc(notifications_Notification*);
-PyObject * Notification_new(PyTypeObject*, PyObject*, PyObject*);
-int Notification_init(notifications_Notification *self, PyObject *args, PyObject *kwds);
+int Notification_init(notifications_Notification*, PyObject*, PyObject*);
+PyObject* Notification_new(PyTypeObject*, PyObject*, PyObject*);
+PyObject* Notification_show(notifications_Notification*);
+
+static PyMemberDef Notification_members[] = {
+    {"title", T_OBJECT_EX, offsetof(notifications_Notification, title), 0,
+     "Notification Title"},
+    {"subtitle", T_OBJECT_EX, offsetof(notifications_Notification, subtitle), 0,
+     "Notification Subtitle"},
+    {"body", T_OBJECT_EX, offsetof(notifications_Notification, body), 0,
+     "Notification Body"},
+    {"delay", T_INT, offsetof(notifications_Notification, delay), 0,
+     "Delay before sending notification"},
+    {NULL}  /* Sentinel */
+};
+
+static PyMethodDef Notification_methods[] = {
+    {"show", (PyCFunction)Notification_show, METH_NOARGS,
+     "Display the notification"
+    },
+    {NULL}  /* Sentinel */
+};
+
 
 static PyTypeObject notifications_NotificationType = {
      PyObject_HEAD_INIT(NULL)
@@ -40,8 +64,8 @@ static PyTypeObject notifications_NotificationType = {
     0,		               /* tp_weaklistoffset */
     0,		               /* tp_iter */
     0,		               /* tp_iternext */
-    0,             /* tp_methods */
-    0,             /* tp_members */
+    Notification_methods,             /* tp_methods */
+    Notification_members,             /* tp_members */
     0,                         /* tp_getset */
     0,                         /* tp_base */
     0,                         /* tp_dict */
