@@ -19,11 +19,11 @@ int Notification_init(notifications_Notification *self, PyObject *args, PyObject
     self->notification = [[NSUserNotification alloc] init];
     self->delay = 0;
 
-    PyObject *title=NULL, *content=NULL;
+    PyObject *title=NULL, *subtitle=NULL, *content=NULL;
 
-    static char *kwlist[] = {"title", "content", "delay", NULL};
+    static char *kwlist[] = {"title", "subtitle", "content", "delay", NULL};
 
-    if (! PyArg_ParseTupleAndKeywords(args, kwargs, "|OOi", kwlist, &title, &content, &self->delay))
+    if (! PyArg_ParseTupleAndKeywords(args, kwargs, "|OOOi", kwlist, &title, &subtitle, &content, &self->delay))
         return -1; 
 
     if (title) {
@@ -31,12 +31,16 @@ int Notification_init(notifications_Notification *self, PyObject *args, PyObject
         [self->notification setTitle:  [NSString stringWithUTF8String: s]];
     }
 
+    if (subtitle) {
+        const char* s = PyString_AsString(subtitle);
+        [self->notification setSubtitle:  [NSString stringWithUTF8String: s]];
+    }
+
 
     if (content) {
         const char* s = PyString_AsString(content);
         [self->notification setInformativeText: [NSString stringWithUTF8String: s]];
     }
-
 
     [self->notification setDeliveryDate:[NSDate dateWithTimeInterval:self->delay sinceDate:[NSDate date]]];
     [self->notification setSoundName:NSUserNotificationDefaultSoundName];

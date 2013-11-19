@@ -1,7 +1,8 @@
 python-notification-center
 ================================
 
-A python module that wraps NSUserNotification on Mac OSX.
+A python module that wraps NSUserNotification on Mac OSX. Not using
+PyObjC, just because I wanted to write a native Python module
 
 Usage:
 
