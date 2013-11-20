@@ -3,6 +3,7 @@
 #include <NSString.h>
 
 static notifications_Notification* set_field(notifications_Notification*, PyObject*);
+static void set_notification_value(NSObject*, PyObject*, NSString*);
 
 void Notification_dealloc(notifications_Notification* self)
 {
@@ -75,22 +76,20 @@ int Notification_init(notifications_Notification *self, PyObject *args, PyObject
 
 PyObject* Notification_show(notifications_Notification *self) {
   NSUserNotification *notification = [[NSUserNotification alloc] init];
-  if (self != NULL) {
-    if (self->title != NULL) {
-      const char* t = PyString_AsString(PyObject_Repr(self->title));
-      [notification setTitle: [NSString stringWithUTF8String: t]];
-    }
-    if (self->subtitle != NULL) {
-      const char* s = PyString_AsString(PyObject_Repr(self->subtitle));
-      [notification setSubtitle: [NSString stringWithUTF8String: s]];
-    }
-    if (self->body != NULL) {
-      const char* b = PyString_AsString(PyObject_Repr(self->body));
-      [notification setInformativeText: [NSString stringWithUTF8String: b]];
-    }
-    [notification setDeliveryDate:[NSDate dateWithTimeInterval:self->delay sinceDate:[NSDate date]]];
+
+  if (self->title != NULL) {
+    set_notification_value(notification, self->title, @"setTitle:");
   }
 
+  if (self->subtitle != NULL) {
+    set_notification_value(notification, self->subtitle, @"setSubtitle:");
+  }
+
+  if (self->body != NULL) {
+    set_notification_value(notification, self->body, @"setInformativeText:");
+  }
+
+  [notification setDeliveryDate:[NSDate dateWithTimeInterval:self->delay sinceDate:[NSDate date]]];
   [notification setSoundName:NSUserNotificationDefaultSoundName];
   NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
   [center scheduleNotification:notification];
@@ -98,3 +97,9 @@ PyObject* Notification_show(notifications_Notification *self) {
   return Py_BuildValue("");
 }
 
+static void set_notification_value(NSObject *object, PyObject* value, NSString *field) {
+  SEL selector = NSSelectorFromString(field);
+  if ([object respondsToSelector:selector]) {
+         [object performSelector:selector withObject:[NSString stringWithUTF8String: PyString_AsString(PyObject_Repr(value))]];
+  }
+}
